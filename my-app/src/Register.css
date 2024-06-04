@@ -5,7 +5,7 @@
     /* text-align: center; */
     margin: auto;
     padding-bottom: 3%;
-    background-color: #50C878;
+    background-color: white;
     box-shadow: 2px 0px 5px 4px rgba(0,0,0,0.75);
 }
 .all{
@@ -13,27 +13,40 @@
 }
 input,select,textarea{
     border-radius: 6px;
-    border: none;
+    /* border: none; */
 }
 .all h1{
-    color: white;
+    color: rgb(74, 74, 148);
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 .search{
     text-align: center;
-    display: flex;
+    /* display: flex; */
+    margin-top: 5%;
     gap: 20px;
     /* background-color: red; */
 }
 .search button{
     /* padding: px 30px; */
     border-radius: 5px;
-    padding:5px 10px ;
+    border: none;
+    margin-left: 2%;
+    background-color:rgb(74, 74, 148) ;
+    color: white;
+    padding: 8px 20px;
 }
-.search input{
-    padding: 4px;
-    width: 60%;
+.search button:hover{
+    background-color: white;
+    border: 1px solid rgb(74, 74, 148);
+    color: rgb(74, 74, 148);
+}
+/* .search input{
+    padding: 7px;
+    width: 100%;
     margin-left: 20px;
+} */
+#searchs{
+    /* padding: 1px 1px 1px 1px; */
 }
 .search label{
     margin-left: 20px;
@@ -46,6 +59,10 @@ input,select,textarea{
 .id input{
     width: 20%;
 }
+.uhid{
+    width: 15%;
+    
+}
 .heading{
     text-align: start;
     
@@ -57,21 +74,33 @@ input,select,textarea{
 .name{
     margin-left: 4%;
     display: flex;
-    width: 100%;
+    flex-wrap: wrap;
+    gap: 30px;
 
 }
 .name select{
-    padding: 5px ;
+    padding: 0px 3px 0px 3px ;
 }
 .name input{
-    margin-left: 3%;
-    padding: 8px 8px;
-    width: 100%;
+    margin-left: 4%;
+    /* padding: 8px 8px; */
+    width: 70%;
+}
+.names{
+    width: 70%;
+    
+}
+.dates{
+    width: 30%;
 }
 .detail{
     margin-top: 4%;
     margin-left: 4%;
     
+}
+.gender{
+    display: flex;
+    gap: 20px;
 }
 .dob{
     margin-left: 2%;
@@ -80,11 +109,16 @@ input,select,textarea{
 }
 .dd,.mm,.yy{
     margin-left: 2%;
-    width: 5%;
+    width: 12%;
 }
+
 .sec-detail{
-    margin-top: 4%;
-    margin-left: 4%;
+    margin-top: 5%;
+    display: flex;
+    width: 100%;
+    gap: 10%;
+    /* justify-content: space-around; */
+    margin-left: 6%;
 }
 .phone{
     margin-left: 2%;
@@ -92,9 +126,13 @@ input,select,textarea{
     width: 40%;
 }
 .email{
-    margin-left: 2%;
-    padding: 8px 8px;
-    width: 40%;
+    /* margin-left: 3%; */
+    /* padding: 8px 8px; */
+    /* margin-top: 3%; */
+    /* width: 70%; */
+}
+.emails{
+    width: 100%;
 }
 .address{
     margin-top: 4%;
@@ -108,6 +146,13 @@ input,select,textarea{
 .address label{
     margin-left: 2%;
 }
+.adresses{
+    width: 89%;
+}
+.add-detail{
+    text-align: right;
+    margin: 2% 3% 0% 0%;
+}
 .buttons{
     margin-top: 3%;
     text-align: center;
@@ -116,12 +161,17 @@ input,select,textarea{
     padding: 8px 20px;
     margin-left: 4%;
     background-color: white;
-    color: #ee6c4f;
-    border: none;
+    color: rgb(74, 74, 148);
+    border: 1px solid rgb(74, 74, 148);
     border-radius: 5px;
 }
 .close{
     text-align: end;
     margin-top: 1%;
     margin-right: 3%;
+}
+.buttons button:hover{
+    background-color: rgb(74, 74, 148);
+    color: white;
+    transition: .2s;
 }
