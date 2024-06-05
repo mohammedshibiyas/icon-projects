@@ -10,9 +10,12 @@ import axios from 'axios';
 
 
 
+
 const Register = () => {
 
-
+// variable
+const yearid=2425;
+const branchid=2;
     // depent dropdow
     const [selectPrefix, setSelectedPrefix] = useState('');
   const [selectGender, setSelectedGender] = useState('');
@@ -73,14 +76,39 @@ const Register = () => {
     };
 
     // show data
+    const[val,setval]=useState({
+      YearId:yearid,
+      BranchId:branchid,
+      SrchItem:"",
+      SrchVal:""
+    })
+
+    const Takedata=async(e)=>{
+      setval((pre)=>({...pre,[e.target.name]:e.target.value}))
+      console.log(e.target.value);
+ 
+       console.log(setval);
+    }
+    // console.log(setval);
+    
+
+
+
+
     const [Getdata,setData]=useState([])
     const getAlldata=async()=>{
-      const res=await axios.get(" http://172.16.16.10:8082/api/PatientMstr/PatientSearchMaster")
-      setData(res.data)
-      console.log(Getdata);
+      
+     
+        try {
+          const res=await axios.post("http://172.16.16.10:8082/api/PatientMstr/PatientSearchMaster",{...val})
+          setData(res.data)
+          console.log(Getdata);
+        } catch (error) {
+          console.log(error);
+        }
     }
     useEffect(()=>{
-      getAlldata()
+     
     },[])
 
 
@@ -108,6 +136,7 @@ const Register = () => {
           labelId="prefix-label"
           id="prefix-select"
           value={selectPrefix}
+          name=' SrchItem'
           style={{ height: '40px',width: '120px' }}
           onChange={handlePrefixChange}
         >
@@ -118,22 +147,21 @@ const Register = () => {
         </Select>
       </FormControl>
       
-      <TextField id="outlined-basic searchinp" label="Search patient" variant="outlined" InputProps={{ style: { height: '40px' ,width:'300px',marginLeft:'10px' } }}
+      <TextField id="outlined-basic searchinp" onChange={Takedata} label="Search patient" variant="outlined" name='SrchVal' InputProps={{ style: { height: '40px' ,width:'300px',marginLeft:'10px' } }}
              InputLabelProps={{ style: { fontSize: '14px', marginTop: '-4px' } }} className='searchs' />
-        <button>Search</button>
+        <button onClick= {getAlldata}>Search</button>
       </div>
       <div className="id">
 
-        <TextField id="outlined-basic" label="UHID" variant="outlined" InputProps={{ style: { height: '40px' ,width:'100px' } }}
+        <TextField id="outlined-basic" onChange={Takedata} label="yearid" name='' variant="outlined" InputProps={{ style: { height: '40px' ,width:'100px' } }}
              InputLabelProps={{ style: { fontSize: '14px', marginTop: '-4px' } }}  className='uhid' />
+             
       </div>
       <div className="heading">
         <h3>Patient Details:</h3>
       </div>
      <div className="maping">
-      {
-        Getdata.map((data,index)=>{
-          <div className="show" key={index}>
+     <div className="show" >
              <form action="" onSubmit={handleRegister} onChange={handlePrefixChange}>
       <div className="name">
       <FormControl>
@@ -151,7 +179,7 @@ const Register = () => {
         </Select>
       </FormControl>
    
-        <TextField id="outlined-basic" label="Patient Name" variant="outlined" InputProps={{ style: { height: '40px' ,width:'100%' } }}
+        <TextField id="outlined-basic" value={Getdata.Patient_Name} label="Patient Name" variant="outlined" InputProps={{ style: { height: '40px' ,width:'100%' } }}
              InputLabelProps={{ style: { fontSize: '14px', marginTop: '-4px' } }}  className='names' />
       </div>
 
@@ -217,8 +245,6 @@ const Register = () => {
       </div>
       </form>
           </div>
-        })
-      }
      </div>
       </div>
 }
