@@ -1,35 +1,21 @@
-.App {
-    font-family: sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 50px;
-  }
-  
-  .form-group {
-    position: relative;
-    margin: 20px 0;
-    width: 300px;
-  }
-  
-  .form-control {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: 2px solid #ccc;
-    border-radius: 4px;
-    outline: none;
-    position: relative;
-    z-index: 1;
-  }
-  
-  label {
-    position: absolute;
-    top: 50%;
-    left: 10px;
-    transform: translateY(-50%);
-    background-color: white;
-    padding: 0 5px;
-    color: #aaa;
-    transition: 0.3s
-  }  
+.suggestions-list {
+  border: 1px solid #ccc;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  width: 100%;
+  background-color: #fff;
+  z-index: 1000;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestions-list li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestions-list li:hover {
+  background-color: #f0f0f0;
+}

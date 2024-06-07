@@ -2,12 +2,13 @@ import { useState } from 'react'
  import './App.css'
 import './Register.css'
 import Register from './Register'
-import PatientSearch from './Apps'
-import PatientList from './Apps'
-import Selection from './Apps'
-import Select from './Apps'
+import PatientSearch from './Search'
+
+
 import Demo from './Demo'
-import Apps from './Apps'
+
+import NameSearch from './Search'
+import Registercpy from './componenets/Registercpy'
 
 // import PopupRegistrationBox from './PopupRegistrationBox'
 // import Selectbox from './Select'
@@ -19,10 +20,14 @@ function App() {
 
   return (
     <>
-    <Register/>
+    {/* <Register/> */}
     {/* <Apps/> */}
    {/* <Demo/> */}
+   {/* <NameSearch/> */}
     {/* <Select/> */}
+  {/* <PatientSearch/> */}
+  <Registercpy/>
+    
     </>
   )
 }
