@@ -6,9 +6,8 @@ import { FormControl, Select, MenuItem, InputLabel } from '@mui/material';
 import axios from 'axios';
 
 const Registercpy = () => {
-  // State variables for form fields
-  const [yearId, setYearId] = useState(2425);
-  const [branchId, setBranchId] = useState(2);
+  const [yearId] = useState(2425);
+  const [branchId] = useState(2);
   const [searchItem, setSearchItem] = useState('Patient ID');
   const [searchValue, setSearchValue] = useState('');
   const [patientData, setPatientData] = useState(null);
@@ -18,54 +17,80 @@ const Registercpy = () => {
 
   const [selectPrefix, setSelectedPrefix] = useState('');
   const [selectGender, setSelectedGender] = useState('');
-  const [date, setDate] = useState('');
-  const [day, setDay] = useState('');
-  const [month, setMonth] = useState('');
-  const [year, setYear] = useState('');
+  const [dob, setDob] = useState('');
+  const [age, setAge] = useState({ years: '', months: '', days: '' });
   const [isOpen, setIsOpen] = useState(false);
 
-  // Gender data mapping
   const genderdata = {
     MR: 'Male',
     MRS: 'Female'
   };
 
-  // Handle prefix change
   const handlePrefixChange = (event) => {
     const prefix = event.target.value;
     setSelectedPrefix(prefix);
     setSelectedGender(genderdata[prefix] || '');
   };
 
-  // Handle gender change
   const handleGenderChange = (event) => {
     setSelectedGender(event.target.value);
   };
-
-  // Handle date change
   const handleDateChange = (event) => {
     const selectedDate = event.target.value;
-    setDate(selectedDate);
-
-    // Split the date into components
-    const [yyyy, mm, dd] = selectedDate.split('-');
-    setDay(dd);
-    setMonth(mm);
-    setYear(yyyy);
+    setDob(selectedDate);
+    calculateAge(selectedDate);
   };
 
-  // Function to fetch patient data
+  const calculateAge = (dob) => {
+    const dobDate = new Date(dob);
+    const today = new Date();
+    let years = today.getFullYear() - dobDate.getFullYear();
+    let months = today.getMonth() - dobDate.getMonth();
+    let days = today.getDate() - dobDate.getDate();
+
+    if (days < 0) {
+      months--;
+      days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+    }
+
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    setAge({ years, months, days });
+  };
+
+
+  // const handleDateChange = (event) => {
+  //   const selectedDate = event.target.value;
+  //   setDate(selectedDate);
+
+  //   const [yyyy, mm, dd] = selectedDate.split('-');
+  //   setDay(dd);
+  //   setMonth(mm);
+  //   setYear(yyyy);
+  // };
+
   const fetchPatientData = async () => {
     try {
-      const response = await axios.post('http://172.16.16.10:8082/api/PatientMstr/PatientSearchMaster', {
+      const response = await axios.post('http://172.16.16.10:8082/api/PatientMstr/PatientDetailsMaster', {
         YearId: yearId,
         BranchId: branchId,
-        SrchItem: searchItem,
-        SrchVal: searchValue.trim().toLowerCase(),
+        PatCode: searchValue.trim()
       });
 
-      if (response.data && response.data.patientList && response.data.patientList.length > 0) {
-        setPatientData(response.data.patientList[0]);
+      if (response.data && response.data.patDetails) {
+        const patient = response.data.patDetails;
+        setPatientData({
+          Patient_Code: patient.Patient_Code,
+          Patient_Name: patient.Patient_Name,
+          Patient_Ismale: patient.Patient_Ismale,
+          Patient_Email: patient.Patient_Email,
+          Patient_Phno: patient.Patient_Phno,
+          Patient_Address: patient.Patient_Address,
+          Patient_Note: patient.Patient_Note,
+        });
       } else {
         alert("No patient data found.");
         setPatientData(null);
@@ -76,7 +101,6 @@ const Registercpy = () => {
     }
   };
 
-  // Function to fetch suggestions
   const fetchSuggestions = async (value) => {
     try {
       const response = await axios.post('http://172.16.16.10:8082/api/PatientMstr/PatientSearchMaster', {
@@ -87,12 +111,10 @@ const Registercpy = () => {
       });
 
       if (response.data && response.data.patientList) {
-        const filteredSuggestions = response.data.patientList.map(patient => {
-          return {
-            value: patient.Patient_Code,
-            display: `${patient.Patient_Code} - ${patient.Patient_Name}`
-          };
-        });
+        const filteredSuggestions = response.data.patientList.map(patient => ({
+          value: patient.Patient_Code,
+          display: `${patient.Patient_Code} - ${patient.Patient_Name}`
+        }));
         setSuggestions(filteredSuggestions);
         setShowSuggestions(true);
       } else {
@@ -104,7 +126,6 @@ const Registercpy = () => {
     }
   };
 
-  // Handle input change for suggestions
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchValue(value);
@@ -117,39 +138,32 @@ const Registercpy = () => {
     }
   };
 
-  // Handle suggestion click
   const handleSuggestionClick = (value) => {
     setSearchValue(value);
     setShowSuggestions(false);
   };
 
-  // Function to clear form
   const clearForm = () => {
     setSelectedPrefix('');
     setSelectedGender('');
-    setDate('');
-    setDay('');
-    setMonth('');
-    setYear('');
+   setDob('');
+    setAge('');
     setPatientData(null);
     setSearchValue('');
     setSuggestions([]);
     setShowSuggestions(false);
   };
 
-  // Handle registration form submission
   const handleRegister = (e) => {
     e.preventDefault();
     console.log("Registration logic goes here");
     closePopup();
   };
 
-  // Handle popup close
   const closePopup = () => {
     setIsOpen(false);
   };
 
-  // Handle popup open
   const openPopup = () => {
     setIsOpen(true);
   };
@@ -210,7 +224,7 @@ const Registercpy = () => {
                 <button onClick={fetchPatientData}>Search</button>
               </div>
             </div>
-            {/* End first row */}
+            
             <form action="" onSubmit={handleRegister}>
               {patientData && (
                 <div>
@@ -236,6 +250,7 @@ const Registercpy = () => {
                         id="patient-name"
                         label="Patient Name"
                         value={patientData.Patient_Name}
+                        onChange={(e) => setPatientData({ ...patientData, Patient_Name: e.target.value })}
                         variant="outlined"
                         InputProps={{ style: { height: '40px', width: '410px' } }}
                       />
@@ -264,32 +279,37 @@ const Registercpy = () => {
                       label=""
                       variant="outlined"
                       type="date"
-                      value={date} onChange={handleDateChange}
+                      value={dob} onChange={handleDateChange}
                       InputProps={{ style: { height: '40px', width: '250px' } }}
                     />
 
                     <div className="dates">
-                      <TextField
-                        id="dd"
-                        value={day}
-                        label="DD"
+                    <TextField
+                        id="yy"
+                        value={age.years}
+                        disabled
+                        label="YY"
                         variant="outlined"
                         InputProps={{ style: { height: '40px', width: '60px' } }}
                       />
+                      
                       <TextField
                         id="mm"
-                        value={month}
+                        value={age.months}
+                        disabled
                         label="MM"
                         variant="outlined"
                         InputProps={{ style: { height: '40px', width: '60px' } }}
                       />
                       <TextField
-                        id="yy"
-                        value={year}
-                        label="YY"
+                        id="dd"
+                        value={age.days}
+                        disabled
+                        label="DD"
                         variant="outlined"
                         InputProps={{ style: { height: '40px', width: '60px' } }}
                       />
+                     
                     </div>
                   </div>
 
@@ -298,13 +318,17 @@ const Registercpy = () => {
                       id="phone"
                       label="Phone"
                       value={patientData.Patient_Phno}
+                      onChange={(e) => setPatientData({ ...patientData, Patient_Phno: e.target.value })}
+
                       variant="outlined"
                       InputProps={{ style: { height: '40px', width: '300px' } }}
                     />
                     <TextField
                       id="email"
+                      type='email'
                       label="Email"
                       value={patientData.Patient_Email}
+                      onChange={(e)=>setPatientData({...patientData, Patient_Email:e.target.value})}
                       variant="outlined"
                       InputProps={{ style: { height: '40px', width: '300px' } }}
                     />
@@ -314,6 +338,7 @@ const Registercpy = () => {
                     <TextField
                       id="address"
                       value={patientData.Patient_Address}
+                      onChange={(e)=>setPatientData({...patientData, Patient_Address:e.target.value})}
                       label="Address"
                       multiline
                       maxRows={3}
@@ -325,6 +350,7 @@ const Registercpy = () => {
                       id="notes"
                       label="Notes"
                       value={patientData.Patient_Note}
+                      onChange={(e)=>setPatientData({...patientData, Patient_Note:e.target.value})}
                       multiline
                       maxRows={4}
                       InputProps={{ style: { height: '120px', width: 500 } }}
@@ -343,7 +369,7 @@ const Registercpy = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div>  
       }
     </div>
   )

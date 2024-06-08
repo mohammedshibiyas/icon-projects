@@ -9,6 +9,7 @@ import Demo from './Demo'
 
 import NameSearch from './Search'
 import Registercpy from './componenets/Registercpy'
+import Date from './componenets/Date'
 
 // import PopupRegistrationBox from './PopupRegistrationBox'
 // import Selectbox from './Select'
@@ -27,6 +28,7 @@ function App() {
     {/* <Select/> */}
   {/* <PatientSearch/> */}
   <Registercpy/>
+  {/* <Date/> */}
     
     </>
   )
