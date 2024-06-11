@@ -17,10 +17,27 @@ const Registercpy = () => {
   const searchItems = ['Patient ID', 'Name', 'Email', 'Phone'];
 
   const [prefix, setPrefix] = useState(''); // State for prefix
-  const [gender, setGender] = useState(''); // State for gender
+  // const [gender, setGender] = useState(''); // State for gender
+  const [gender, setGender] = useState(patientData?.Patient_Ismale ? 'Male' : 'Female'); // Set initial gender based on fetched data (if available)
+
   const [dob, setDob] = useState('');
   const [age, setAge] = useState({ years: '', months: '', days: '' });
   const [isOpen, setIsOpen] = useState(false);
+
+    // State for validation errors
+    const [nameError, setNameError] = useState(false);
+ 
+    // INPUT CHANGES HANDLE
+    const handletextfieldchange=(e)=>{
+      setPatientData((pre)=>({...pre,[e.target.name]:e.target.value}))
+      if (e.target.validity.valid) {
+        setNameError(false);
+      } else {
+        setNameError(true);
+      }
+     
+      setEditFlag(1)
+    }
 
   const handleDateChange = (event) => {
     const selectedDate = event.target.value;
@@ -69,8 +86,18 @@ const Registercpy = () => {
           Patient_Address: patient.Patient_Address,
           Patient_Note: patient.Patient_Note,
         });
+  
         setPrefix(patient.Patient_Title);
-        setGender(patient.Patient_Ismale ? 'Male' : 'Female'); // Set gender based on database value
+        console.log(patient.Patient_Ismale,"hello");
+        // Gender selection   
+        if (patient.Patient_Ismale==="Male") {
+         
+          setGender('Male')
+          
+        } else {
+          setGender('Female')
+          
+        }
         setDob(patient.Patient_Dob);
         calculateAge(patient.Patient_Dob);
         setEditFlag(0);
@@ -83,6 +110,7 @@ const Registercpy = () => {
       alert("Failed to fetch patient data.");
     }
   };
+  
   
   const fetchSuggestions = async (value) => {
     try {
@@ -135,6 +163,13 @@ const Registercpy = () => {
     setSearchValue('');
     setSuggestions([]);
     setShowSuggestions(false);
+    setErrors({
+      Patient_Name: '',
+      Patient_Email: '',
+      Patient_Phno: '',
+      Patient_Address: '',
+      Patient_Dob: '',
+    });
     setEditFlag(0);
   };
 
@@ -161,7 +196,8 @@ const Registercpy = () => {
         Patient_Code: patientData.Patient_Code,
         Patient_Dob: dob,
         Patient_Email: patientData.Patient_Email,
-        Patient_Ismale: gender==='Male' ,
+        Patient_Ismale: gender ,
+        
         Patient_mobile: patientData.Patient_Phno,
         Patient_Name: patientData.Patient_Name,
         Patient_Title: prefix,
@@ -187,20 +223,51 @@ const Registercpy = () => {
   const openPopup = () => {
     setIsOpen(true);
   };
-// handlePrefixChange
-  const handlePrefixChange = (event) => {
-    const selectedPrefix = event.target.value;
-    setPrefix(selectedPrefix);
+// PREFIX CHANGE
+const handlePrefixChange = (event) => {
+  const selectedPrefix = event.target.value;
+  setPrefix(selectedPrefix);
 
-    // Automatically set gender based on the prefix
-    if (selectedPrefix === 'MR') {
-      setGender('Male');
-    } else if (selectedPrefix === 'MRS') {
-      setGender('Female');
-    }
+  // Automatically set gender based on the prefix
+  if (selectedPrefix === 'MR') {
+    setGender('Male');
+  } else if (selectedPrefix === 'MRS') {
+    setGender('Female');
+  }
 
-    setEditFlag(1); // Mark the form as edited
-  };
+  setPatientData((prevData) => ({
+    ...prevData,
+    Patient_Title: selectedPrefix,
+    Patient_Ismale: selectedPrefix === 'MR',
+  }));
+  setEditFlag(1);
+};
+// GENDER CHANGE
+const handleGenderChange = (event) => {
+  const selectedGender = event.target.value;
+  setGender(selectedGender);
+
+  // Set prefix based on gender selection
+  if (selectedGender === 'Male') {
+    setPrefix('MR');
+  } else if (selectedGender === 'Female') {
+    setPrefix('MRS');
+  }
+
+  setPatientData((prevData) => ({
+    ...prevData,
+    Patient_Ismale: selectedGender === 'Male',
+  }));
+  setEditFlag(1);
+};
+ // Function to highlight the search term in the suggestions
+ const highlightSearchTerm = (text, term) => {
+  const regex = new RegExp(`(${term})`, 'gi');
+  return text.replace(regex, '<strong>$1</strong>');
+};
+
+
+
 
   return (
     <div>
@@ -249,7 +316,7 @@ const Registercpy = () => {
                   <ul className="suggestions-list">
                     {suggestions.map((suggestion, index) => (
                       <li key={index} onClick={() => handleSuggestionClick(suggestion.value)}>
-                        {suggestion.display}
+                         <span dangerouslySetInnerHTML={{ __html: highlightSearchTerm(suggestion.display, searchValue) }} />
                       </li>
                     ))}
                   </ul>
@@ -284,14 +351,16 @@ const Registercpy = () => {
                     <div className="pat-name">
                       <TextField
                         id="patient-name"
+                        required
+                        name='Patient_Name'
                         label="Patient Name"
                         value={patientData.Patient_Name}
-                        onChange={(e) => {
-                          setPatientData({ ...patientData, Patient_Name: e.target.value });
-                          setEditFlag(1);
-                        }}
+                        onChange={handletextfieldchange}
+                         error={nameError}
+                        helperText={nameError ? "Please enter your name" : ""}
                         variant="outlined"
                         InputProps={{ style: { height: '40px', width: '410px' } }}
+                       
                       />
                     </div>
                   </div>
@@ -301,19 +370,17 @@ const Registercpy = () => {
                       <FormControl>
                         <InputLabel id="gender-label">Gender</InputLabel>
                         <Select
-                          labelId="gender-label"
-                          id="gender-select"
-                          value={gender}
-                          label="Gender"
-                          sx={{ width: 150, height: 40 }}
-                          onChange={(e) => {
-                            setGender(e.target.value);
-                            setEditFlag(1);
-                          }}
-                        >
-                          <MenuItem value='Male'>Male</MenuItem>
-                          <MenuItem value='Female'>Female</MenuItem>
-                        </Select>
+                        labelId="gender-label"
+                        id="gender-select"
+                        value={gender}
+                        label="Gender"
+                        sx={{ width: 150, height: 40 }}
+                        onChange={handleGenderChange}
+                      >
+                        <MenuItem value='Male'>Male</MenuItem>
+                        <MenuItem value='Female'>Female</MenuItem>
+                      </Select>
+
                       </FormControl>
                     </div>
                     <TextField
@@ -370,24 +437,20 @@ const Registercpy = () => {
                   <div className="forth-row">
                     <TextField
                       id="phone"
+                      name='Patient_Phno'
                       label="Phone"
                       value={patientData.Patient_Phno}
-                      onChange={(e) => {
-                        setPatientData({ ...patientData, Patient_Phno: e.target.value });
-                        setEditFlag(1);
-                      }}
+                      onChange={handletextfieldchange}
                       variant="outlined"
                       InputProps={{ style: { height: '40px', width: '300px' } }}
                     />
                     <TextField
                       id="email"
                       type='email'
+                      name='Patient_Email'
                       label="Email"
                       value={patientData.Patient_Email}
-                      onChange={(e) => {
-                        setPatientData({ ...patientData, Patient_Email: e.target.value });
-                        setEditFlag(1);
-                      }}
+                      onChange={handletextfieldchange}
                       variant="outlined"
                       InputProps={{ style: { height: '40px', width: '300px' } }}
                     />
@@ -396,11 +459,9 @@ const Registercpy = () => {
                   <div className="address">
                     <TextField
                       id="address"
+                      name='Patient_Address'
                       value={patientData.Patient_Address}
-                      onChange={(e) => {
-                        setPatientData({ ...patientData, Patient_Address: e.target.value });
-                        setEditFlag(1);
-                      }}
+                      onChange={handletextfieldchange}
                       label="Address"
                       multiline
                       maxRows={3}
@@ -411,11 +472,9 @@ const Registercpy = () => {
                     <TextField
                       id="notes"
                       label="Notes"
+                      name='Patient_Note'
                       value={patientData.Patient_Note}
-                      onChange={(e) => {
-                        setPatientData({ ...patientData, Patient_Note: e.target.value });
-                        setEditFlag(1);
-                      }}
+                      onChange={handletextfieldchange}
                       multiline
                       maxRows={4}
                       InputProps={{ style: { height: '120px', width: 500 } }}
