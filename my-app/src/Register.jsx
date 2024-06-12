@@ -124,7 +124,7 @@ const branchid=2;
           {isOpen &&
         <div className="card">
             <div className="close">
-            <i class="fa fa-times" aria-hidden="true" onClick={closePopup}></i>
+            <i className="fa fa-times" aria-hidden="true" onClick={closePopup}></i>
             </div>
       <div className="all">
         <h1>Registration Form</h1>

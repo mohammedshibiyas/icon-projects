@@ -25,15 +25,35 @@ const Registercpy = () => {
   const [isOpen, setIsOpen] = useState(false);
 
     // State for validation errors
-    const [nameError, setNameError] = useState(false);
+    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const [errors, setErrors] = useState({
+      Patient_Name: '',
+      Patient_Email: '',
+    });
+
+    const [phone, setPhone] = useState('');
+    const [error, setError] = useState('');
+  
+    const validatePhone = (phone) => {
+      // Regular expression for a 10-digit number
+      const regex = /^\d{10}$/;
+      return regex.test(phone);
+    };
  
     // INPUT CHANGES HANDLE
     const handletextfieldchange=(e)=>{
       setPatientData((pre)=>({...pre,[e.target.name]:e.target.value}))
+      setPhone(e.target.value)
       if (e.target.validity.valid) {
-        setNameError(false);
+        setErrors({ ...errors, [e.target.name]: '' });
       } else {
-        setNameError(true);
+        const newError = e.target.validationMessage || 'This field is invalid.';
+        setErrors({ ...errors, [e.target.name]: newError });
+      }
+      if (e.target.value && !validatePhone(e.target.value)) {
+        setError('Phone number must be exactly 10 digits.');
+      } else {
+        setError('');
       }
      
       setEditFlag(1)
@@ -183,6 +203,18 @@ const Registercpy = () => {
     } else {
       await updatePatientData();
     }
+    const {  Patient_Email } = errors;
+    // if (!Patient_Name && !Patient_Email && !Patient_Phno) {
+    //   alert('Please fill at least one required field.');
+    //   return;
+    // }
+    if (Patient_Email && !EMAIL_REGEX.test(Patient_Email)) {
+      setErrors({ ...errors, Patient_Email: 'Invalid email format.' });
+      return;
+    }
+    if (!validatePhone(phone)) {
+      alert('Please enter a valid 10-digit phone number.');
+    } 
     setEditFlag(0);
   };
 
@@ -356,8 +388,8 @@ const handleGenderChange = (event) => {
                         label="Patient Name"
                         value={patientData.Patient_Name}
                         onChange={handletextfieldchange}
-                         error={nameError}
-                        helperText={nameError ? "Please enter your name" : ""}
+                        error={!!errors.Patient_Name}
+                        helperText={errors.Patient_Name}
                         variant="outlined"
                         InputProps={{ style: { height: '40px', width: '410px' } }}
                        
@@ -437,10 +469,13 @@ const handleGenderChange = (event) => {
                   <div className="forth-row">
                     <TextField
                       id="phone"
+                      type='number'
                       name='Patient_Phno'
                       label="Phone"
                       value={patientData.Patient_Phno}
                       onChange={handletextfieldchange}
+                      error={!!error}
+                      helperText={error}
                       variant="outlined"
                       InputProps={{ style: { height: '40px', width: '300px' } }}
                     />
@@ -452,6 +487,8 @@ const handleGenderChange = (event) => {
                       value={patientData.Patient_Email}
                       onChange={handletextfieldchange}
                       variant="outlined"
+                      error={!!errors.Patient_Email}
+                      helperText={errors.Patient_Email}
                       InputProps={{ style: { height: '40px', width: '300px' } }}
                     />
                   </div>
